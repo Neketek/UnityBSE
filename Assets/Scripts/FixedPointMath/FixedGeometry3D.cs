@@ -24,6 +24,11 @@ namespace DGPE.Math.FixedPoint.Geometry3D{
 		public IndexedFixedVertex3D(Fixed x,Fixed y,Fixed z,int index):base(x,y,z){
 			this.index = index;
 		}
+		public override string ToString ()
+		{
+			return string.Format ("[IndexedFixedVertex3D: index={0}]", index);
+		}
+		
 	}
 	public class FixedTriangle3D{
 		private FixedVertex3D a,b,c;
@@ -90,6 +95,7 @@ namespace DGPE.Math.FixedPoint.Geometry3D{
 		private const  int BOT_RIG = 1;
 		private const  int TOP_LEF = 2;
 		private const  int TOP_RIG = 3;
+		private const  int TRIANGLE_INDEXES_PER_CELL = 6;
 		private class CellNode{
 			public readonly FixedTriangle3D bl_tr_br;
 			public readonly FixedTriangle3D bl_tr_tl;
@@ -129,14 +135,27 @@ namespace DGPE.Math.FixedPoint.Geometry3D{
 			this.CreateIndexedVerticesList ();
 			this.CreateCells ();
 		}
+		public FixedVector3 GetVertexCoordinates(int index){
+			return this.vertices[index].coordinates;
+		}
+		public int GetVertexCount(){
+			return this.vertices.Count;
+		}
+		public int GetCellsCount(){
+			return this.width*this.height;
+		}
+		public int GetTriangleCount(){
+			return GetCellsCount()*2;
+		}
 		public void PutCellTriangleIndexesToArray(int beginPosition,int[]triangleArray,int x,int z){
 			CellNode cell = cells [z, x];
-			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_br.A).index;
+			//reverse
+			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.A).index;
+			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.C).index;
+			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.B).index;
 			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_br.B).index;
 			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_br.C).index;
-			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.A).index;
-			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.B).index;
-			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.C).index;
+			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_br.A).index;
 		}
 		public Fixed GetYFromCellSafe(Fixed x,Fixed z){
 			if (x.IsNegativeOrZero () || z.IsNegativeOrZero () || x > gridXDimensionMax || z > gridZDimensionMax)
