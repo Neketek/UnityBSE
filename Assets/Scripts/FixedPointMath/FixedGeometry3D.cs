@@ -149,7 +149,6 @@ namespace DGPE.Math.FixedPoint.Geometry3D{
 		}
 		public void PutCellTriangleIndexesToArray(int beginPosition,int[]triangleArray,int x,int z){
 			CellNode cell = cells [z, x];
-			//reverse
 			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.A).index;
 			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.C).index;
 			triangleArray [beginPosition++] = ((IndexedFixedVertex3D)cell.bl_tr_tl.B).index;

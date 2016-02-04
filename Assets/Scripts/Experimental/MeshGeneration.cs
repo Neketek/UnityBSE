@@ -10,6 +10,9 @@ public class MeshGeneration : MonoBehaviour
 	FixedGridXZ3D grid = null;
 	public int width = 1,height = 1;
 	public float size = 1;
+	public float updateTime = 0;
+	private float currentUpdateTime = 0;
+	MeshFilter meshFilter = null;
 	private static Vector3 FixedVector3ToUnityVector(FixedVector3 fv){
 		return new Vector3((float)fv.x,(float)fv.y,(float)fv.z);
 	}	
@@ -26,22 +29,29 @@ public class MeshGeneration : MonoBehaviour
 	}
 	void Start ()
 	{
-		RandomFixedGenerator fixedRandom = new RandomFixedGenerator(1);
-		System.Random rand = new System.Random();
 		Fixed cellSize = (Fixed)size;
 		grid = new FixedGridXZ3D(width,height,cellSize);
-		MeshFilter meshFilter = GetComponent<MeshFilter>();
-		for(int z = 0;z<grid.height+1;z++){
-			for(int x = 0;x<grid.width+1;x++){
-				grid.SetYOfVertex(x,z,fixedRandom.Next());
-			}
-		}
+		meshFilter = GetComponent<MeshFilter>();
 		meshFilter.mesh = FixedGridXZ3DMeshGenerator.GenerateMesh(grid);
 	}
 	// Update is called once per frame
 	void Update ()
 	{
-	
+
+		if(currentUpdateTime<updateTime)
+			currentUpdateTime+=Time.deltaTime;
+		else{
+			System.Random rand = new System.Random();
+			RandomFixedGenerator fixedRandom = new RandomFixedGenerator(rand.Next());
+			for(int z = 0;z<grid.height+1;z++){
+				for(int x = 0;x<grid.width+1;x++){
+					grid.SetYOfVertex(x,z,fixedRandom.Next((Fixed)size));
+				}
+			}
+			Debug.Log("Update");
+			meshFilter.mesh = FixedGridXZ3DMeshGenerator.GenerateMesh(grid);
+			currentUpdateTime  = 0;
+		}
 	}
 }
 
