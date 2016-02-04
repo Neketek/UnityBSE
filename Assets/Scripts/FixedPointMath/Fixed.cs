@@ -187,6 +187,9 @@ namespace DGPE.Math.FixedPoint{
 		public bool IsNegativeOrZero(){
 			return this.fixedValue <= 0;
 		}
+		public int GetFixedValue(){
+			return this.fixedValue;
+		}
 		private Fixed(int fixedValue){
 			this.fixedValue = fixedValue;
 		}
