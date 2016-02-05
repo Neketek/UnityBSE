@@ -38,20 +38,20 @@ public class MeshGeneration : MonoBehaviour
 	void Update ()
 	{
 
-		if(currentUpdateTime<updateTime)
-			currentUpdateTime+=Time.deltaTime;
-		else{
-			System.Random rand = new System.Random();
-			RandomFixedGenerator fixedRandom = new RandomFixedGenerator(rand.Next());
-			for(int z = 0;z<grid.height+1;z++){
-				for(int x = 0;x<grid.width+1;x++){
-					grid.SetYOfVertex(x,z,fixedRandom.Next((Fixed)size));
-				}
-			}
-			Debug.Log("Update");
-			meshFilter.mesh = FixedGridXZ3DMeshGenerator.GenerateMesh(grid);
-			currentUpdateTime  = 0;
-		}
+//		if(currentUpdateTime<updateTime)
+//			currentUpdateTime+=Time.deltaTime;
+//		else{
+//			System.Random rand = new System.Random();
+//			RandomFixedGenerator fixedRandom = new RandomFixedGenerator(rand.Next());
+//			for(int z = 0;z<grid.height+1;z++){
+//				for(int x = 0;x<grid.width+1;x++){
+//					grid.SetYOfVertex(x,z,fixedRandom.Next(grid.cellSize));
+//				}
+//			}
+//			Debug.Log ("Update");
+//			FixedGridXZ3DMeshGenerator.UpdateGeneratedMesh(grid,meshFilter.mesh);
+//			currentUpdateTime  = 0;
+//		}
 	}
 }
 

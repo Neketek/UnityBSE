@@ -46,10 +46,10 @@ namespace DEngine.Utils.MeshGeneration{
 			}
 			return uv;
 		}
-		private static void UpdateYCoordinate(FixedGridXZ3D grid,Mesh mesh){
+		private static void UpdateYCoordinate(FixedGridXZ3D grid,Vector3[]vertices){
 			int vertexCount = grid.GetVertexCount();
 			for(int i = 0;i<vertexCount;i++){
-				mesh.vertices[i].y  = (float)grid.GetVertexCoordinates(i).y;
+				vertices[i].y  = (float)grid.GetVertexCoordinates(i).y;
 			}
 		}
 		public static Mesh GenerateMesh(FixedGridXZ3D grid){
@@ -62,7 +62,9 @@ namespace DEngine.Utils.MeshGeneration{
 			return mesh;
 		}
 		public static void UpdateGeneratedMesh(FixedGridXZ3D grid,Mesh mesh){
-			UpdateYCoordinate(grid,mesh);
+			Vector3[] vertices = mesh.vertices;
+			UpdateYCoordinate (grid,vertices);
+			mesh.vertices = vertices;
 			mesh.RecalculateNormals();
 			mesh.Optimize();
 		}
