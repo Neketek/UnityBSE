@@ -20,6 +20,12 @@ namespace DEngine.Utils{
 		public Fixed Next(Fixed min,Fixed max){
 			return Fixed.CreateFixedByFixedValue(integerRandom.Next(min.GetFixedValue(),max.GetFixedValue()));
 		}
+		public int NextInt(int min,int max){
+			return integerRandom.Next(min,max);
+		}
+		public void SetRandomSeed(int seed){
+			this.integerRandom = new System.Random(seed);
+		}
 	}
 	public class RandomColorGenerator{
 		private System.Random integerRandom;

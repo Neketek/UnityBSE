@@ -10,13 +10,10 @@ namespace CFixedPoint
 
 		public static void Main (string[] args)
 		{
-			FixedVertex3D a = new FixedVertex3D (1,-2,0);
-			FixedVertex3D b = new FixedVertex3D (2,0,-1);
-			FixedVertex3D c = new FixedVertex3D (0,-1,2);
-			FixedTriangle3D tria = new FixedTriangle3D (a,b,c);
-			tria.RecalculateSurfaceEquation ();
-			Console.WriteLine (tria);
-			FixedGridXZ3D grid = new FixedGridXZ3D (10,10, (Fixed)1);
+			FixedRectangle2D rect = new FixedRectangle2D((Fixed)(0),(Fixed)(0),(Fixed)1,(Fixed)2);
+			Console.WriteLine(rect);
+			rect.RotateZAxe(90,new FixedVector2(0,0));
+			Console.WriteLine(rect);
 		}
 	}
 }

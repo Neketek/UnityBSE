@@ -4,15 +4,16 @@ namespace DGPE.Math.FixedPoint.Geometry2D{
 	public interface Vertex2DChangeListener{
 		void Vertex2DChangedEvent (FixedVertex2D vertex);
 	}
-//	public interface FixedShape2D{
-//		bool Contains (FixedVector2 vertex);
-//		FixedShape2D Translate(FixedVector2 coordinates);
-//		FixedShape2D Translate(Fixed x,Fixed y);
-//		FixedShape2D Rotate (Fixed sin, Fixed cos, FixedVector2 pivot);
-//		FixedShape2D Rotate (int deg, FixedVector2 pivot);
-//		FixedShape2D Scale (FixedVector2 scale, FixedVector2 pivot);
-//		FixedShape2D Scale (FixedVector2 scale);
-//	}
+	public interface FixedShape2D{
+		bool Contains (FixedVector2 vertex);
+		bool Contains(int x,int y);
+		bool Contains(Fixed x,Fixed y);
+		Fixed GetBoundingBoxMaxY();
+		Fixed GetBoundingBoxMinY();
+		Fixed GetBoundingBoxMinX();
+		Fixed GetBoundingBoxMaxX();
+		FixedShape2D RotateZAxe(int deg,FixedVector2 pivot);
+	}
 	public class FixedVertex2D{
 		private List<Vertex2DChangeListener> listeners = null;
 		private FixedVector2 coordinates;
@@ -120,8 +121,13 @@ namespace DGPE.Math.FixedPoint.Geometry2D{
 			return this;
 		}
 		private void InvokeOwnerChangeMethod(){
-			foreach (Vertex2DChangeListener listener in listeners) {
-				listener.Vertex2DChangedEvent (this);
+			if(listeners!=null){
+				System.Console.WriteLine(this);
+				System.Console.WriteLine("Invokes");
+				foreach (Vertex2DChangeListener listener in listeners) {
+					listener.Vertex2DChangedEvent (this);
+					System.Console.WriteLine(listener);
+				}
 			}
 		}
 
@@ -258,7 +264,7 @@ namespace DGPE.Math.FixedPoint.Geometry2D{
 			directionRecalculationRequired = true;
 		}
 	}
-	public class FixedTriangle2D:Vertex2DChangeListener{
+	public class FixedTriangle2D:Vertex2DChangeListener,FixedShape2D{
 		private FixedVertex2D a,b,c;
 		private FixedVector2 ab,bc,ca;
 		private bool directionalVectorsRecalculationRequired = true;
@@ -351,6 +357,73 @@ namespace DGPE.Math.FixedPoint.Geometry2D{
 		{
 			return string.Format ("[FixedTriangle2D: a={0}, b={1}, c={2}]", a, b, c);
 		}
+		//FIXME:Check this method by testing or logic
+		public bool Contains (FixedVector2 vertex)
+		{
+			return IsInTriangle(vertex);
+		}
+
+		public bool Contains (int x, int z)
+		{
+			return IsInTriangle(new FixedVector2(x,z));
+		}
+
+		public bool Contains (Fixed x, Fixed z)
+		{
+			return IsInTriangle(new FixedVector2(x,z));
+		}
+
+		public Fixed GetBoundingBoxMaxY ()
+		{
+			if(a.Y>=b.Y&&a.Y>=c.Y)
+				return a.Y;
+			else{
+				if(b.Y>=c.Y&&b.Y>=a.Y)
+					return b.Y;
+				else 
+					return c.Y;
+			}
+		}
+
+		public Fixed GetBoundingBoxMinY ()
+		{
+			if(a.Y<=b.Y&&a.Y<=c.Y)
+				return a.Y;
+			else{
+				if(b.Y<=c.Y&&b.Y<=a.Y)
+					return b.Y;
+				else 
+					return c.Y;
+			}
+		}
+
+		public Fixed GetBoundingBoxMinX ()
+		{
+			if(a.X<=b.Y&&a.X<=c.Y)
+				return a.X;
+			else{
+				if(b.X<=c.Y&&b.X<=a.X)
+					return b.X;
+				else 
+					return c.X;
+			}
+		}
+
+		public Fixed GetBoundingBoxMaxX ()
+		{
+			if(a.X>=b.Y&&a.X>=c.Y)
+				return a.X;
+			else{
+				if(b.X>=c.Y&&b.X>=a.X)
+					return b.X;
+				else 
+					return c.X;
+			}
+		}
+		FixedShape2D FixedShape2D.RotateZAxe (int deg, FixedVector2 pivot)
+		{
+			return RotateZAxe(deg,pivot);
+		}
 		private void RecalculateDirectionalVectors(){
 			if (directionalVectorsRecalculationRequired) {
 				ab = a.GetDirectionTo (b);
@@ -401,7 +474,7 @@ namespace DGPE.Math.FixedPoint.Geometry2D{
 				throw new System.ArgumentOutOfRangeException ("cell height <= 0");
 		}
 	}
-	public class FixedRectangle2D{
+	public class FixedRectangle2D:FixedShape2D{
 		private FixedTriangle2D abc,acd;
 		private FixedVertex2D a, b, c, d;
 		public FixedRectangle2D(Fixed leftX,Fixed bottomY,Fixed width,Fixed height){
@@ -413,8 +486,8 @@ namespace DGPE.Math.FixedPoint.Geometry2D{
 			this.b = new FixedVertex2D (b);
 			this.c = new FixedVertex2D (c);
 			this.d = new FixedVertex2D (d);
-			abc = new FixedTriangle2D (a,b,c);
-			acd = new FixedTriangle2D (a,c,d);
+			abc = new FixedTriangle2D (this.a,this.b,this.c);
+			acd = new FixedTriangle2D (this.a,this.c,this.d);
 		}
 		public bool IsInRectangle(FixedVector2 coordinates){
 			return abc.IsInTriangle (coordinates) || acd.IsInTriangle (coordinates);
@@ -477,8 +550,90 @@ namespace DGPE.Math.FixedPoint.Geometry2D{
 		{
 			return string.Format ("[FixedRectangle2D: a={0}, b={1}, c={2}, d={3}]", a, b, c, d);
 		}
+		public bool Contains (FixedVector2 vertex)
+		{
+			return IsInRectangle(vertex);
+		}
+
+		public bool Contains (int x, int y)
+		{
+			return IsInRectangle(new FixedVector2(x,y));
+		}
+
+		public bool Contains (Fixed x, Fixed y)
+		{
+			return IsInRectangle(new FixedVector2(x,y));
+		}
+
+		public Fixed GetBoundingBoxMaxY ()
+		{
+			if(a.Y>=b.Y&&a.Y>=c.Y&&a.Y>=d.Y){
+				return a.Y;
+			}else{
+				if(b.Y>=a.Y&&b.Y>=c.Y&&b.Y>=d.Y){
+					return b.Y;
+				}else{
+					if(c.Y>=a.Y&&c.Y>=b.Y&&c.Y>=d.Y)
+						return c.Y;
+					else
+						return d.Y;
+				}
+			}
+		}
+
+		public Fixed GetBoundingBoxMinY ()
+		{
+			if(a.Y<=b.Y&&a.Y<=c.Y&&a.Y<=d.Y){
+				return a.Y;
+			}else{
+				if(b.Y<=a.Y&&b.Y<=c.Y&&b.Y<=d.Y){
+					return b.Y;
+				}else{
+					if(c.Y<=a.Y&&c.Y<=b.Y&&c.Y<=d.Y)
+						return c.Y;
+					else
+						return d.Y;
+				}
+			}
+		}
+
+		public Fixed GetBoundingBoxMinX ()
+		{
+			if(a.X<=b.X&&a.X<=c.X&&a.X<=d.X){
+				return a.X;
+			}else{
+				if(b.X<=a.X&&b.X<=c.X&&b.X<=d.X){
+					return b.X;
+				}else{
+					if(c.X<=a.X&&c.X<=b.X&&c.X<=d.X)
+						return c.X;
+					else
+						return d.X;
+				}
+			}
+		}
+
+		public Fixed GetBoundingBoxMaxX ()
+		{
+			if(a.X>=b.X&&a.X>=c.X&&a.X>=d.X){
+				return a.X;
+			}else{
+				if(b.X>=a.X&&b.X>=c.X&&b.X>=d.X){
+					return b.X;
+				}else{
+					if(c.X>=a.X&&c.X>=b.X&&c.X>=d.X)
+						return c.X;
+					else
+						return d.X;
+				}
+			}
+		}
+		FixedShape2D FixedShape2D.RotateZAxe (int deg, FixedVector2 pivot)
+		{
+			return RotateZAxe(deg,pivot);
+		}
 	}
-	public class FixedCircle2D{
+	public class FixedCircle2D:FixedShape2D{
 		private FixedVertex2D center;
 		private Fixed radius;
 		private Fixed squareRadius;
@@ -511,6 +666,50 @@ namespace DGPE.Math.FixedPoint.Geometry2D{
 				radius = value;
 				squareRadius = Fixed.Square (radius);
 			}
+		}
+		public Fixed SquareRadius {
+			get {
+				return this.squareRadius;
+			}
+		}
+		public bool Contains (FixedVector2 vertex)
+		{
+			return IsInCircle(vertex);
+		}
+
+		public bool Contains (int x, int y)
+		{
+			return IsInCircle(new FixedVector2(x,y));
+		}
+
+		public bool Contains (Fixed x, Fixed y)
+		{
+			return IsInCircle(new FixedVector2(x,y));
+		}
+
+		public Fixed GetBoundingBoxMaxY ()
+		{
+			return center.Y+radius;
+		}
+
+		public Fixed GetBoundingBoxMinY ()
+		{
+			return center.Y-radius;
+		}
+
+		public Fixed GetBoundingBoxMinX ()
+		{
+			return center.X-radius;
+		}
+
+		public Fixed GetBoundingBoxMaxX ()
+		{
+			return center.X+radius;
+		}
+		public FixedShape2D RotateZAxe (int deg, FixedVector2 pivot)
+		{
+			center.RotateZAxe(deg,pivot);
+			return this;
 		}
 	}
 }

@@ -39,6 +39,8 @@ namespace DGPE.Math.FixedPoint{
 			this.x = x;
 			this.y = y;
 		}
+		public FixedVector2(int x,int y):this((Fixed)x,(Fixed)y){
+		}
 		public FixedVector2 RotateZAxe(int deg,FixedVector2 pivotPoint){
 			return RotateZAxe (FixedTrig.Sin(deg),FixedTrig.Cos(deg),pivotPoint);
 		}
